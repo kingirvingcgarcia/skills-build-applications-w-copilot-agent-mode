@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
+import cors from 'cors';
 import Activity from './models/Activity.js';
 import Leaderboard from './models/Leaderboard.js';
 import Team from './models/Team.js';
@@ -9,12 +10,18 @@ import database from './config/database.js';
 const app = express();
 const port = Number(process.env.PORT) || 8000;
 const codespaceName = process.env.CODESPACE_NAME;
+const frontendOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...(codespaceName ? [`https://${codespaceName}-5173.app.github.dev`] : []),
+];
 
 export const baseUrl = codespaceName
   ? `https://${codespaceName}-8000.app.github.dev`
   : 'http://localhost:8000';
 
 app.use(express.json());
+app.use(cors({ origin: frontendOrigins }));
 
 app.get('/api/health', (_request, response) => {
   response.json({
